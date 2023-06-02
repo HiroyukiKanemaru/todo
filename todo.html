@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>chatApp</title>
+  <style>
+    #output li {
+      background: #ccc;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Todo List</h1>
+  <!-- 入力場所を作成しよう -->
+  <form>
+    <fieldset>
+      <legend>Task入力画面</legend>
+      <div>
+        name: <input type="text" id="title">
+      </div>
+      <div>
+        <button type="button" id="send">send</button>
+      </div>
+    </fieldset>
+  </form>
+
+  <!-- データ出力場所 -->
+  <ul id="output"></ul>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+  <script type="module">
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+    // TODO: Add SDKs for Firebase products that you want to use
+    // https://firebase.google.com/docs/web/setup#available-libraries
+    import {
+      getFirestore,
+      collection,
+      addDoc,
+      serverTimestamp,
+      onSnapshot,
+    } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyBmyon5Xe6Hj2nvuti1LQlrBzeYmPwzQ5U",
+      authDomain: "list-38fe2.firebaseapp.com",
+      projectId: "list-38fe2",
+      storageBucket: "list-38fe2.appspot.com",
+      messagingSenderId: "96528257294",
+      appId: "1:96528257294:web:68470bdc8d8c0ff96c075f"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    $("#send").on("click", function () {
+      const postData = {
+        title: $("#title").val(),
+      };
+      addDoc(collection(db, "todo"), postData);
+      $("#text").val("");
+    });
+
+    onSnapshot(collection(db, "todo"), (querySnapshot) => {
+      console.log(querySnapshot.docs);
+      const documents = [];
+      querySnapshot.docs.forEach(function (doc) {
+        const document = {
+          id: doc.id,
+          data: doc.data(),
+        };
+        documents.push(document);
+      });
+
+      console.log(documents);
+      const htmlElements = [];
+      documents.forEach(function (document) {
+        htmlElements.push(`
+    <li id="${document.id}">
+      <p>${document.data.title}</p>
+    </li>
+  `);
+      });
+
+      $("#output").html(htmlElements);
+    });
+
+  </script>
+
+
+</body>
+
+</html>
